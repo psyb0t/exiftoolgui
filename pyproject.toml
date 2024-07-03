@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "exiftoolgui"
-version = "0.1.4"
+version = "0.1.5"
 authors = [
     { name = "Ciprian Mandache", email = "psyb0t@51k.eu" }, # Role: Orchestrator
     { name = "Claude 3.5 Sonnet" },                         # Role: Developer

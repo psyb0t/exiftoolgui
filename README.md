@@ -51,6 +51,12 @@ Gear up to install ExifTool GUI using pip, the tool of choice for Python rebels:
 pip install exiftoolgui
 ```
 
+or better
+
+```
+pipx install exiftoolgui
+```
+
 Note: This renegade software demands that ExifTool be installed on your system and lurking in your PATH like a ninja.
 
 ## Usage
@@ -59,6 +65,12 @@ Ignite the ExifTool GUI application and start bending digital reality by running
 
 ```
 python -m exiftoolgui
+```
+
+or better
+
+```
+exiftoolgui
 ```
 
 ## License
