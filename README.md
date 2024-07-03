@@ -1,4 +1,4 @@
-# ExifTool GUI by Claude 3.5 Sonnet
+# ExifTool GUI (with Claude 3.5 Sonnet)
 
 Welcome to ExifTool GUI, the badass desktop wizard for digital anarchists and cybernauts who want to manipulate EXIF data like a boss. This tool lets you hack away the unnecessary digital footprint or tweak it to perfection.
 
@@ -8,6 +8,40 @@ Welcome to ExifTool GUI, the badass desktop wizard for digital anarchists and cy
 - **Tag Manipulator**: Edit EXIF tags like a street artist revises urban landscapes.
 - **Memory Wipe**: Strip all EXIF data clean off your images—go incognito.
 - **Batch Rebellion**: Conquer multiple images at once; batch process like a pro.
+
+## Prerequisites
+
+Before you can unleash the full power of ExifTool GUI, you'll need to make sure your rig is properly equipped:
+
+- **ExifTool**: This is the core engine behind the scenes. ExifTool must be installed on your machine for our GUI to do its magic. Without it, you’re going nowhere, fast.
+
+### Installing ExifTool:
+
+#### On macOS:
+
+If you’re wielding a Mac, just pop open your terminal and fire this up:
+
+```
+brew install exiftool
+```
+
+#### On Linux:
+
+For the Linux commandos, you can deploy ExifTool using your package manager. For most distros, that’ll look something like:
+
+```
+sudo apt install libimage-exiftool-perl
+```
+
+or
+
+```
+sudo yum install perl-Image-ExifTool
+```
+
+---
+
+Make sure these are set up, and you're ready to dive into the digital deep end with ExifTool GUI. Let the chaos commence!
 
 ## Installation
 
