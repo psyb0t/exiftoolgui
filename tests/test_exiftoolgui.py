@@ -1,10 +1,13 @@
 import unittest
+import subprocess
 from unittest.mock import patch, MagicMock
-import tkinter as tk
-from exiftoolgui import ExifToolGUI
-
+from exiftoolgui.exiftoolgui import ExifToolGUI
 class TestExifToolGUI(unittest.TestCase):
-    def setUp(self):
+    @patch('subprocess.run')
+    def setUp(self, mock_run):
+        mock_run.return_value.stdout = "12.34\n"
+        mock_run.return_value.returncode = 0
+
         self.mock_tk = MagicMock()
         self.mock_ttk = MagicMock()
         self.mock_filedialog = MagicMock()
@@ -12,7 +15,7 @@ class TestExifToolGUI(unittest.TestCase):
         self.mock_scrolledtext = MagicMock()
 
         self.module_patcher = patch.multiple(
-            'exiftoolgui',
+            'exiftoolgui.exiftoolgui',
             tk=self.mock_tk,
             ttk=self.mock_ttk,
             filedialog=self.mock_filedialog,
@@ -27,12 +30,28 @@ class TestExifToolGUI(unittest.TestCase):
     def tearDown(self):
         self.module_patcher.stop()
 
-    def test_run_exiftool(self):
+    def test_check_exiftool(self):
         with patch('subprocess.run') as mock_run:
-            mock_run.return_value.stdout = "Test output"
-            result = self.app.run_exiftool(["test.jpg"])
-            self.assertEqual(result, "Test output")
-            mock_run.assert_called_once_with(['exiftool', "test.jpg"], capture_output=True, text=True, check=True)
+            mock_run.return_value.stdout = "12.34\n"
+            mock_run.return_value.returncode = 0
+            version = ExifToolGUI.check_exiftool()
+            self.assertEqual(version, "12.34")
+
+        with patch('subprocess.run', side_effect=FileNotFoundError):
+            with self.assertRaises(FileNotFoundError):
+                ExifToolGUI.check_exiftool()
+
+        with patch('subprocess.run', side_effect=subprocess.CalledProcessError(1, 'exiftool')):
+            with self.assertRaises(RuntimeError):
+                ExifToolGUI.check_exiftool()
+
+    @patch('subprocess.run')
+    def test_run_exiftool(self, mock_run):
+        mock_run.return_value.stdout = "Test output"
+        result = self.app.run_exiftool(["test.jpg"])
+        self.assertEqual(result, "Test output")
+        mock_run.assert_called_with(['exiftool', "test.jpg"], capture_output=True, text=True, check=True)
+
 
     def test_pretty_print_json(self):
         input_text = 'Tag1: {"key": "value"}\nTag2: Not JSON'
@@ -42,10 +61,10 @@ class TestExifToolGUI(unittest.TestCase):
 
     def test_browse_file(self):
         self.mock_filedialog.askopenfilename.return_value = "test.jpg"
-        with patch.object(self.app, 'run_exiftool', return_value="EXIF data") as mock_run_exiftool:
+        with patch.object(self.app, 'run_exiftool', return_value="EXIF data"):
             self.app.browse_file()
             self.assertEqual(self.app.current_file, "test.jpg")
-            mock_run_exiftool.assert_called_once_with(["test.jpg"])
+            self.app.run_exiftool.assert_called_once_with(["test.jpg"])
 
     def test_apply_edit(self):
         self.app.current_file = "test.jpg"
@@ -53,9 +72,9 @@ class TestExifToolGUI(unittest.TestCase):
         self.app.tag_entry.get.return_value = "TestTag"
         self.app.value_entry = MagicMock()
         self.app.value_entry.get.return_value = "TestValue"
-        with patch.object(self.app, 'run_exiftool') as mock_run_exiftool:
+        with patch.object(self.app, 'run_exiftool'):
             self.app.apply_edit()
-            mock_run_exiftool.assert_called_once_with(['-TestTag=TestValue', 'test.jpg'])
+            self.app.run_exiftool.assert_called_once_with(['-TestTag=TestValue', 'test.jpg'])
 
         # Test error when no file is selected
         self.app.current_file = None
@@ -74,9 +93,9 @@ class TestExifToolGUI(unittest.TestCase):
 
     def test_remove_all_exif(self):
         self.app.current_file = "test.jpg"
-        with patch.object(self.app, 'run_exiftool') as mock_run_exiftool:
+        with patch.object(self.app, 'run_exiftool'):
             self.app.remove_all_exif()
-            mock_run_exiftool.assert_called_once_with(['-all=', '-overwrite_original', 'test.jpg'])
+            self.app.run_exiftool.assert_called_once_with(['-all=', '-overwrite_original', 'test.jpg'])
 
         # Test error when no file is selected
         self.app.current_file = None
@@ -90,15 +109,16 @@ class TestExifToolGUI(unittest.TestCase):
 
     def test_batch_process(self):
         self.app.batch_directory = "/test/directory"
+        self.app.batch_operation = MagicMock()
         self.app.batch_operation.get.return_value = "view"
-        with patch.object(self.app, 'run_exiftool', return_value="EXIF data") as mock_run_exiftool:
+        with patch.object(self.app, 'run_exiftool', return_value="EXIF data"):
             self.app.batch_process()
-            mock_run_exiftool.assert_called_once_with(['-recurse', '/test/directory'])
+            self.app.run_exiftool.assert_called_once_with(['-recurse', '/test/directory'])
 
         self.app.batch_operation.get.return_value = "remove"
-        with patch.object(self.app, 'run_exiftool') as mock_run_exiftool:
+        with patch.object(self.app, 'run_exiftool'):
             self.app.batch_process()
-            mock_run_exiftool.assert_called_once_with(['-all=', '-overwrite_original', '-recurse', '/test/directory'])
+            self.app.run_exiftool.assert_called_once_with(['-all=', '-overwrite_original', '-recurse', '/test/directory'])
 
         # Test error when no directory is selected
         self.app.batch_directory = None
