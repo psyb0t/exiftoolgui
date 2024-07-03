@@ -9,6 +9,7 @@ jobs:
     with:
       python_version: "3.12.0"
       install_dependencies_command: "make dep"
+      test_command: "make test"
       build_command: "make build"
       dist_dir: "dist"
 
