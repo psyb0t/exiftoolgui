@@ -1,3 +1,6 @@
 venv
 __pycache__
 .pytest_cache
+dist
+CLAUDE.md
+git-update.sh

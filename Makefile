@@ -1,7 +1,7 @@
 .PHONY: dep build clean help
 
 dep: ## Install dependencies
-	python -m pip install build pytest
+	python -m pip install build==1.4.3 pytest==9.0.3
 
 test: ## Run tests
 	python -m pytest
