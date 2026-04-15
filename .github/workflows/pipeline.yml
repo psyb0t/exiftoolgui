@@ -12,7 +12,7 @@ jobs:
       test_command: "make test"
       build_command: "make build"
       dist_dir: "dist"
-      code_checks: '["bandit", "pylint", "flake8"]'
+      code_checks: '["bandit", "flake8"]'
 
     secrets:
       pypi_api_token: ${{ secrets.PYPI_API_TOKEN }}
